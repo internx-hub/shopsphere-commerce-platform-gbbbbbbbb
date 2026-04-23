@@ -1,2 +1,32 @@
-# shopsphere-commerce-platform-gbbbbbbbb
-[InternX] Build a full-stack e-commerce platform: product catalogue, cart, checkout, order management, and an admin dashboard. The platform uses a Next.js frontend, a FastAPI backend, and a Supabase database. | Stack: Next.js 14, FastAPI, Supabase, Tailwind CSS, Playwright
+# E-commerce Platform Testing Suite
+
+## Tech Stack
+- Frontend: Next.js
+- Backend: FastAPI
+- Database: Supabase
+- Testing: Playwright
+
+---
+
+## Test Coverage
+
+### Auth Flow
+- Signup
+- Login
+- Logout
+- Protected route validation
+
+### Checkout Flow
+- Add to cart
+- Checkout process
+- Payment simulation
+- Order success validation
+
+---
+
+## How to Run Tests
+
+```bash
+npm install
+npx playwright install
+npx playwright test

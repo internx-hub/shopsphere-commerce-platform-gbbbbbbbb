@@ -1,40 +1,41 @@
 import { test, expect } from '@playwright/test';
+import { login, addToCart } from '../utils/test-helpers';
 
-test.describe('🛒 E2E Checkout Flow', () => {
+const email = `checkout${Date.now()}@mail.com`;
+const password = 'Test@1234';
 
-  test('Complete add-to-cart → checkout → order success flow', async ({ page }) => {
+test.describe('Checkout Flow E2E', () => {
 
-    // 🔹 1. Go to products page
-    await page.goto('/products');
+  test.beforeEach(async ({ page }) => {
+    // Ensure user exists or use seeded user
+    await page.goto('/signup');
+    await page.fill('input[name="email"]', email);
+    await page.fill('input[name="password"]', password);
+    await page.click('button[type="submit"]');
+  });
 
-    // 🔹 2. Add product to cart
-    await page.click('text=Add to Cart');
+  test('User completes full checkout flow', async ({ page }) => {
 
-    // Assert cart count updated
-    const cartCount = page.locator('.cart-count');
-    await expect(cartCount).toHaveText('1');
+    // Login
+    await login(page, email, password);
 
-    // 🔹 3. Go to cart page
-    await page.click('.cart-icon');
-    await expect(page).toHaveURL(/.*cart/);
+    // Add to cart
+    await addToCart(page);
 
-    // 🔹 4. Proceed to checkout
-    await page.click('text=Checkout');
-    await expect(page).toHaveURL(/.*checkout/);
+    // Proceed to checkout
+    await page.click('button:has-text("Checkout")');
+    await expect(page).toHaveURL(/checkout/);
 
-    // 🔹 5. Fill checkout details
-    await page.fill('#name', 'Test User');
-    await page.fill('#address', 'Chennai, Tamil Nadu');
-    await page.fill('#card', '4111111111111111');
-    await page.fill('#cvv', '123');
+    // Fill checkout details
+    await page.fill('input[name="address"]', '123 Test Street');
+    await page.fill('input[name="city"]', 'Chennai');
+    await page.fill('input[name="pincode"]', '600001');
 
-    // 🔹 6. Place order
-    await page.click('text=Place Order');
+    // Simulate payment (Stripe test mode)
+    await page.click('button:has-text("Pay Now")');
 
-    // 🔹 7. Verify success page
-    await expect(page).toHaveURL(/.*order-success/);
-    await expect(page.locator('h1')).toHaveText(/Order Successful/i);
-
+    // Success page
+    await expect(page.locator('text=Order Successful')).toBeVisible();
   });
 
 });

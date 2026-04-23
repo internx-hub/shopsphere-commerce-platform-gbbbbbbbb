@@ -1,106 +1,45 @@
-# 🧪 Sprint 01 Regression Log
+# Sprint 01 Regression Log
 
-**Sprint Duration:** 1 May 2025 – 12 May 2025  
-**Tester:** QA Team  
-**Status:** In Progress  
+## Bug 1: Signup does not validate weak passwords
 
----
-
-## 📊 Summary
-- Total Bugs Found: 5
-- Critical: 1
-- High: 2
-- Medium: 2
-- Low: 0
+- **Severity:** Medium
+- **Steps to Reproduce:**
+  1. Go to /signup
+  2. Enter email
+  3. Enter password "123"
+  4. Submit form
+- **Expected:** Error message for weak password
+- **Actual:** Account created successfully
 
 ---
 
-## 🐛 Bug List
+## Bug 2: Unauthorized user can access dashboard
 
-### 🔴 BUG-001: Login fails with valid credentials
-- **Severity:** Critical  
-- **Status:** Open  
-- **Module:** Authentication  
-
-**Steps to Reproduce:**
-1. Go to Login Page  
-2. Enter valid email & password  
-3. Click Login  
-
-**Expected Result:**  
-User should be redirected to dashboard  
-
-**Actual Result:**  
-Error message: "Invalid credentials"  
+- **Severity:** High
+- **Steps to Reproduce:**
+  1. Open /dashboard without login
+- **Expected:** Redirect to /login
+- **Actual:** Dashboard loads
 
 ---
 
-### 🟠 BUG-002: Cart count not updating
-- **Severity:** High  
-- **Status:** Open  
-- **Module:** Cart  
+## Bug 3: Cart not persisting after refresh
 
-**Steps to Reproduce:**
-1. Go to Products  
-2. Click "Add to Cart"  
-
-**Expected Result:**  
-Cart count increases  
-
-**Actual Result:**  
-Cart count remains same  
+- **Severity:** High
+- **Steps to Reproduce:**
+  1. Add product to cart
+  2. Refresh page
+- **Expected:** Cart retains items
+- **Actual:** Cart is empty
 
 ---
 
-### 🟡 BUG-003: Checkout button unresponsive
-- **Severity:** Medium  
-- **Status:** Open  
-- **Module:** Checkout  
+## Bug 4: Checkout fails without error message
 
-**Steps to Reproduce:**
-1. Add item to cart  
-2. Go to Cart  
-3. Click Checkout  
-
-**Expected Result:**  
-Navigate to checkout page  
-
-**Actual Result:**  
-Nothing happens  
-
----
-
-### 🟡 BUG-004: Logout not clearing session
-- **Severity:** Medium  
-- **Status:** Open  
-- **Module:** Authentication  
-
-**Steps to Reproduce:**
-1. Login  
-2. Click Logout  
-3. Refresh page  
-
-**Expected Result:**  
-User should be logged out  
-
-**Actual Result:**  
-User still logged in  
-
----
-
-### 🟠 BUG-005: Order success page missing details
-- **Severity:** High  
-- **Status:** Open  
-- **Module:** Orders  
-
-**Steps to Reproduce:**
-1. Complete checkout  
-2. Go to success page  
-
-**Expected Result:**  
-Order details displayed  
-
-**Actual Result:**  
-Blank page  
-
----
+- **Severity:** Critical
+- **Steps to Reproduce:**
+  1. Add product to cart
+  2. Go to checkout
+  3. Click Pay Now
+- **Expected:** Payment success or failure message
+- **Actual:** No response / blank state
