@@ -1,40 +1,52 @@
 import { test, expect } from '@playwright/test';
 
-const email = `checkout${Date.now()}@test.com`;
-const password = 'Test@1234';
+const email = process.env.TEST_USER_EMAIL!;
+const password = process.env.TEST_USER_PASSWORD!;
 
-test.describe('Checkout Flow', () => {
+test.describe('Full E2E Checkout Flow', () => {
 
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/signup');
+  test('User completes full purchase journey', async ({ page }) => {
 
-    await page.fill('input[name="email"]', email);
-    await page.fill('input[name="password"]', password);
-    await page.click('button[type="submit"]');
-  });
+    try {
+      // STEP 1: Login
+      await page.goto('/login');
 
-  test('Complete checkout process', async ({ page }) => {
+      await page.fill('input[name="email"]', email);
+      await page.fill('input[name="password"]', password);
+      await page.click('button[type="submit"]');
 
-    // Go to products
-    await page.goto('/products');
+      await expect(page).toHaveURL(/dashboard/);
 
-    // Add to cart
-    await page.click('button:has-text("Add to Cart")');
+      // STEP 2: Go to products
+      await page.goto('/products');
 
-    // Go to cart
-    await page.goto('/cart');
-    await page.click('button:has-text("Checkout")');
+      // STEP 3: Add product to cart
+      await page.click('button:has-text("Add to Cart")');
 
-    // Fill details
-    await page.fill('input[name="address"]', '123 Street');
-    await page.fill('input[name="city"]', 'Chennai');
-    await page.fill('input[name="pincode"]', '600001');
+      // STEP 4: Go to cart
+      await page.goto('/cart');
+      await expect(page.locator('text=Your Cart')).toBeVisible();
 
-    // Payment
-    await page.click('button:has-text("Pay Now")');
+      // STEP 5: Proceed to checkout
+      await page.click('button:has-text("Checkout")');
+      await expect(page).toHaveURL(/checkout/);
 
-    // Success check
-    await expect(page.locator('text=Order Successful')).toBeVisible();
+      // STEP 6: Fill checkout form
+      await page.fill('input[name="address"]', '123 Test Street');
+      await page.fill('input[name="city"]', 'Chennai');
+      await page.fill('input[name="pincode"]', '600001');
+
+      // STEP 7: Payment simulation
+      await page.click('button:has-text("Pay Now")');
+
+      // STEP 8: Verify success
+      await expect(page.locator('text=Order Successful')).toBeVisible();
+
+    } catch (error) {
+      console.error('Checkout flow failed:', error);
+      throw error; // Important for Playwright to mark test failed
+    }
+
   });
 
 });
