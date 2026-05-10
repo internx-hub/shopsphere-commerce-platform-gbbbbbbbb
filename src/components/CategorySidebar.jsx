@@ -1,69 +1,66 @@
-import React from "react";
+import React from 'react'
 
-export default function CategorySidebar({
-  categories = [],
-  selectedCategory,
-  onSelect,
-}) {
-  return (
-    <nav style={styles.sidebar} aria-label="Product categories">
-      <h2 style={styles.heading}>Categories</h2>
-
-      <button
-        style={{
-          ...styles.item,
-          ...(selectedCategory === null ? styles.active : {}),
-        }}
-        onClick={() => onSelect(null)}
-      >
-        All Products
-      </button>
-
-      {categories.map((cat) => {
-        const isActive = selectedCategory === cat;
-
-        return (
-          <button
-            key={cat}
-            style={{ ...styles.item, ...(isActive ? styles.active : {}) }}
-            onClick={() => onSelect(cat)}
-          >
-            {cat}
-          </button>
-        );
-      })}
-    </nav>
-  );
+// Category icon map — extend as needed
+const CATEGORY_ICONS = {
+  Electronics: '💻',
+  Fashion: '👗',
+  'Home & Kitchen': '🏠',
+  Sports: '🏋️',
+  Grocery: '🛒',
 }
 
-const styles = {
-  sidebar: {
-    padding: "1rem",
-    borderRadius: "14px",
-    border: "1px solid #e5e7eb",
-    background: "#ffffff",
-    boxShadow: "0 4px 14px rgba(0,0,0,0.04)",
-  },
-  heading: {
-    fontSize: "1rem",
-    fontWeight: 700,
-    marginBottom: "1rem",
-  },
-  item: {
-    width: "100%",
-    textAlign: "left",
-    padding: "0.75rem 0.85rem",
-    marginBottom: "0.5rem",
-    borderRadius: "10px",
-    border: "1px solid transparent",
-    background: "#f9fafb",
-    cursor: "pointer",
-    fontSize: "0.95rem",
-    fontWeight: 500,
-  },
-  active: {
-    background: "#dbeafe",
-    border: "1px solid #93c5fd",
-    fontWeight: 700,
-  },
-};
+/**
+ * CategorySidebar
+ *
+ * Sticky sidebar listing all product categories derived from the live product set.
+ * Calls onSelect(category) on click; onSelect(null) resets to "All".
+ *
+ * Accessible: <nav> landmark, aria-current on active item, keyboard-navigable buttons.
+ */
+export default function CategorySidebar({ categories = [], selectedCategory, onSelect }) {
+  // Silent guard — no console.error left in production code
+  if (!Array.isArray(categories)) return null
+
+  return (
+    <nav
+      className="category-sidebar"
+      aria-label="Product categories"
+    >
+      <h2 className="category-sidebar__heading">Categories</h2>
+
+      <ul className="category-sidebar__list" role="list">
+        {/* All Products reset */}
+        <li>
+          <button
+            className={`category-sidebar__item${!selectedCategory ? ' category-sidebar__item--active' : ''}`}
+            onClick={() => onSelect(null)}
+            aria-current={!selectedCategory ? 'true' : undefined}
+            aria-label="Show all products"
+          >
+            <span className="category-sidebar__icon" aria-hidden="true">🏪</span>
+            All Products
+          </button>
+        </li>
+
+        {categories.map((cat) => {
+          const isActive = selectedCategory === cat
+          return (
+            <li key={cat}>
+              <button
+                className={`category-sidebar__item${isActive ? ' category-sidebar__item--active' : ''}`}
+                onClick={() => onSelect(cat)}
+                aria-current={isActive ? 'true' : undefined}
+                aria-label={`Filter by ${cat}`}
+              >
+                <span className="category-sidebar__icon" aria-hidden="true">
+                  {CATEGORY_ICONS[cat] ?? '📦'}
+                </span>
+                {cat}
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+    </nav>
+  )
+}
