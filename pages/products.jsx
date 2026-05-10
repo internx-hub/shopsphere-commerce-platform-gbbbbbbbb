@@ -1,79 +1,84 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import CategorySidebar from '../src/components/CategorySidebar'
-import ProductGrid from '../src/components/ProductGrid'
-import products as STATIC_PRODUCTS from '../data/products'
-
-// Validate a single product has required fields
-function isValidProduct(p) {
-  return (
-    p &&
-    typeof p === 'object' &&
-    (typeof p.id === 'number' || typeof p.id === 'string') &&
-    typeof p.name === 'string' &&
-    typeof p.price === 'number'
-  )
-}
+import { useEffect, useState } from "react"
+import ProductGrid from "../src/components/ProductGrid"
+import CategorySidebar from "../src/components/CategorySidebar"
+import productsData from "../data/products"
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([])
+  const [selectedCategory, setSelectedCategory] = useState("All")
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [error, setError] = useState("")
 
   useEffect(() => {
-    let cancelled = false
-    async function load() {
-      setLoading(true)
-      setError(null)
+    const fetchProducts = async () => {
       try {
-        const API = process.env.NEXT_PUBLIC_API_URL || process.env.REACT_APP_API_URL
-        if (API) {
-          const res = await fetch(`${API}/api/products`)
-          if (!res.ok) throw new Error(`HTTP ${res.status}`)
-          const data = await res.json()
-          if (!Array.isArray(data)) throw new Error('Response is not an array')
-          const valid = data.filter(isValidProduct)
-          if (!cancelled) setProducts(valid)
-        } else {
-          if (!cancelled) setProducts(STATIC_PRODUCTS.filter(isValidProduct))
-        }
+        setLoading(true)
+
+        // if local data
+        setProducts(productsData)
+
+        // if using API later:
+        // const response = await fetch("/api/products")
+        // if (!response.ok) {
+        //   throw new Error("Failed to fetch products")
+        // }
+        // const data = await response.json()
+        // setProducts(data)
+
       } catch (err) {
-        if (!cancelled) {
-          setProducts(STATIC_PRODUCTS.filter(isValidProduct))
-          setError(`Could not load live data: ${err.message}`)
-        }
+        console.error(err)
+        setError("Unable to load products.")
       } finally {
-        if (!cancelled) setLoading(false)
+        setLoading(false)
       }
     }
-    load()
-    return () => { cancelled = true }
+
+    fetchProducts()
   }, [])
 
-  const categories = useMemo(
-    () => [...new Set(products.map(p => p.category).filter(Boolean))].sort(),
-    [products]
-  )
+  const categories = [
+    ...new Set(products.map((product) => product.category)),
+  ]
+
+  if (loading) {
+    return <h2 style={{ padding: "2rem" }}>Loading products...</h2>
+  }
+
+  if (error) {
+    return (
+      <h2 style={{ padding: "2rem", color: "red" }}>
+        {error}
+      </h2>
+    )
+  }
 
   return (
-    <div style={{ display: 'flex', gap: '2rem', padding: '1.5rem', minHeight: '100vh' }}>
-      <aside style={{ width: 220, flexShrink: 0, alignSelf: 'flex-start', position: 'sticky', top: '1rem' }}>
-        <CategorySidebar
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onSelect={setSelectedCategory}
-        />
-      </aside>
-      <main style={{ flex: 1 }}>
-        <h1>{selectedCategory ?? 'All Products'}</h1>
-        {error && <p role="alert" style={{ color: '#b91c1c' }}>⚠️ {error}</p>}
+    <main style={pageStyle}>
+      <CategorySidebar
+        categories={categories}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+      />
+
+      <div style={{ flex: 1 }}>
+        <h1 style={headingStyle}>Products</h1>
+
         <ProductGrid
           products={products}
           selectedCategory={selectedCategory}
-          loading={loading}
-          error={null}  // error shown above; grid shows fallback data
         />
-      </main>
-    </div>
+      </div>
+    </main>
   )
+}
+
+const pageStyle = {
+  display: "flex",
+  gap: "2rem",
+  padding: "2rem",
+  alignItems: "flex-start",
+}
+
+const headingStyle = {
+  marginBottom: "1.5rem",
 }

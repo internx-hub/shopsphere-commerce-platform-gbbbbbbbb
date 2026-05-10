@@ -1,57 +1,69 @@
-import React from 'react'
-
-/**
- * CategorySidebar
- * Sticky sidebar that lists all product categories.
- * Calls onSelect(category) when a category is clicked.
- * "All" resets the filter (passes null).
- * Accessible: uses nav + aria-current.
- */
-export default function CategorySidebar({ categories = [], selectedCategory, onSelect }) {
-  if (!Array.isArray(categories)) {
-    console.error('[CategorySidebar] categories must be an array')
-    return null
-  }
-
+export default function CategorySidebar({
+  categories = [],
+  selectedCategory,
+  setSelectedCategory,
+}) {
   return (
-    <nav
-      className="category-sidebar"
-      aria-label="Product categories"
-      role="navigation"
-    >
-      <h2 className="category-sidebar__heading">Categories</h2>
+    <aside style={sidebarStyle}>
+      <h2 style={titleStyle}>Categories</h2>
 
-      <ul className="category-sidebar__list" role="list">
-        {/* All Products */}
-        <li>
-          <button
-            className={`category-sidebar__item${!selectedCategory ? ' category-sidebar__item--active' : ''}`}
-            onClick={() => onSelect(null)}
-            aria-current={!selectedCategory ? 'true' : undefined}
-            aria-label="Show all products"
-          >
-            <span className="category-sidebar__icon" aria-hidden="true">🏪</span>
-            All Products
-          </button>
-        </li>
+      <button
+        onClick={() => setSelectedCategory("All")}
+        style={{
+          ...buttonStyle,
+          ...(selectedCategory === "All" ? activeStyle : {}),
+        }}
+      >
+        All
+      </button>
 
-        {categories.map(cat => {
-          const isActive = selectedCategory === cat
-          return (
-            <li key={cat}>
-              <button
-                className={`category-sidebar__item${isActive ? ' category-sidebar__item--active' : ''}`}
-                onClick={() => onSelect(cat)}
-                aria-current={isActive ? 'true' : undefined}
-                aria-label={`Filter by ${cat}`}
-              >
-                <span className="category-sidebar__dot" aria-hidden="true" />
-                {cat}
-              </button>
-            </li>
-          )
-        })}
-      </ul>
-    </nav>
+      {categories.map((category) => (
+        <button
+          key={category}
+          onClick={() => setSelectedCategory(category)}
+          style={{
+            ...buttonStyle,
+            ...(selectedCategory === category ? activeStyle : {}),
+          }}
+        >
+          {category}
+        </button>
+      ))}
+    </aside>
   )
+}
+
+const sidebarStyle = {
+  position: "sticky",
+  top: "20px",
+  alignSelf: "flex-start",
+  padding: "1rem",
+  background: "#ffffff",
+  border: "1px solid #e5e7eb",
+  borderRadius: "12px",
+  minWidth: "220px",
+  height: "fit-content",
+}
+
+const titleStyle = {
+  marginBottom: "1rem",
+  fontSize: "1.2rem",
+}
+
+const buttonStyle = {
+  display: "block",
+  width: "100%",
+  padding: "0.8rem 1rem",
+  marginBottom: "0.6rem",
+  border: "none",
+  borderRadius: "8px",
+  background: "#f3f4f6",
+  cursor: "pointer",
+  textAlign: "left",
+  transition: "0.2s",
+}
+
+const activeStyle = {
+  background: "#111827",
+  color: "#ffffff",
 }

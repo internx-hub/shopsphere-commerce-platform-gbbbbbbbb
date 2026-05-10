@@ -1,89 +1,35 @@
-import React, { useMemo } from 'react'
-import ProductCard from './ProductCard'
-
-function SkeletonCard() {
-  return (
-    <div
-      aria-hidden="true"
-      style={{
-        height: 280, borderRadius: 12,
-        background: '#e5e7eb', animation: 'pulse 1.5s ease-in-out infinite'
-      }}
-    />
-  )
-}
+import ProductCard from "./ProductCard"
 
 export default function ProductGrid({
   products = [],
-  selectedCategory = null,
-  loading = false,
-  error = null,
+  selectedCategory = "All",
 }) {
-  // Prop validation
-  if (!Array.isArray(products)) {
-    console.error('[ProductGrid] products must be an array')
-    return <p role="alert">Invalid product data.</p>
-  }
+  const filteredProducts =
+    selectedCategory === "All"
+      ? products
+      : products.filter(
+          (product) =>
+            product.category?.toLowerCase() ===
+            selectedCategory.toLowerCase()
+        )
 
-  // ── Loading state (was the blocking issue) ──────────────────────────────
-  if (loading) {
+  if (filteredProducts.length === 0) {
     return (
-      <section aria-label="Loading products" aria-busy="true">
-        <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }`}</style>
-        <div style={gridStyle}>
-          {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
-        </div>
-      </section>
-    )
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div role="alert" style={{ color: '#b91c1c', padding: '2rem', textAlign: 'center' }}>
-        <p>⚠️ {error}</p>
-        <p>Please try refreshing the page.</p>
-      </div>
-    )
-  }
-
-  // ── Category filter ─────────────────────────────────────────────────────
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const filtered = useMemo(() => {
-    if (!selectedCategory) return products
-    return products.filter(
-      p => (p.category || '').toLowerCase() === selectedCategory.toLowerCase()
-    )
-  }, [products, selectedCategory])
-
-  if (products.length === 0) {
-    return (
-      <div role="status" style={msgStyle}>
-        <p style={{ fontSize: '2rem' }}>🛒</p>
-        <p><strong>No products available</strong></p>
-      </div>
-    )
-  }
-
-  if (filtered.length === 0) {
-    return (
-      <div role="status" aria-live="polite" style={msgStyle}>
-        <p style={{ fontSize: '2rem' }}>🔍</p>
-        <p><strong>No products in "{selectedCategory}"</strong></p>
-        <p>Try a different category.</p>
+      <div style={emptyStyle}>
+        <h3>No products found</h3>
+        <p>Try selecting another category.</p>
       </div>
     )
   }
 
   return (
-    <section aria-label={selectedCategory ? `${selectedCategory} products` : 'All products'}>
-      <p aria-live="polite" style={{ fontSize: '0.875rem', color: '#666', marginBottom: '1rem' }}>
-        Showing <strong>{filtered.length}</strong> product{filtered.length !== 1 ? 's' : ''}
-        {selectedCategory ? ` in "${selectedCategory}"` : ''}
-      </p>
-      <div style={gridStyle} role="list" aria-label="Product list">
-        {filtered.map(product => (
-          <ProductCard key={product.id ?? product.name} product={product} />
+    <section>
+      <div style={gridStyle}>
+        {filteredProducts.map((product) => (
+          <ProductCard
+            key={product.id || product.name}
+            product={product}
+          />
         ))}
       </div>
     </section>
@@ -91,15 +37,16 @@ export default function ProductGrid({
 }
 
 const gridStyle = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-  gap: '1.25rem',
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+  gap: "1.5rem",
+  width: "100%",
 }
-const msgStyle = {
-  padding: '3rem',
-  textAlign: 'center',
-  color: '#666',
-  background: '#f9fafb',
-  borderRadius: 12,
-  border: '1px solid #e5e7eb',
+
+const emptyStyle = {
+  padding: "3rem",
+  textAlign: "center",
+  background: "#f8fafc",
+  borderRadius: "12px",
+  border: "1px solid #e2e8f0",
 }
