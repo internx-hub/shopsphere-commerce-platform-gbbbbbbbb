@@ -1,20 +1,21 @@
-import React from 'react'
+'use client'
 
-/**
- * StarRating
- * Renders filled/half/empty stars with an accessible aria-label.
- */
-function StarRating({ rating }) {
-  const clamped = Math.min(Math.max(Number(rating) || 0, 0), 5)
+import { Product } from '../types/product'
+
+interface ProductCardProps {
+  product: Product
+}
+
+function StarRating({ rating }: { rating: number }) {
+  const clamped = Math.min(Math.max(rating, 0), 5)
   const full    = Math.floor(clamped)
   const hasHalf = clamped % 1 >= 0.5
   const empty   = 5 - full - (hasHalf ? 1 : 0)
 
   return (
     <span
-      className="star-rating"
+      className="text-amber-400 tracking-wide"
       aria-label={`Rating: ${clamped.toFixed(1)} out of 5`}
-      title={`${clamped.toFixed(1)} / 5`}
     >
       {'★'.repeat(full)}
       {hasHalf ? '½' : ''}
@@ -26,14 +27,12 @@ function StarRating({ rating }) {
 /**
  * ProductCard
  *
- * Displays a single product: image, name, category badge, star rating,
- * price, and an Add to Cart button (disabled when out of stock).
+ * Displays a single product with image, name, category, rating, price,
+ * and an Add to Cart button (disabled when out of stock).
  *
- * Accessible: <article> element, aria-label, keyboard-focusable, lazy image.
+ * Accessible: <article>, aria-label, keyboard-focusable, lazy image load.
  */
-export default function ProductCard({ product }) {
-  if (!product) return null
-
+export default function ProductCard({ product }: ProductCardProps) {
   const {
     id,
     name        = 'Unnamed Product',
@@ -45,17 +44,17 @@ export default function ProductCard({ product }) {
     inStock     = true,
   } = product
 
-  const formattedPrice =
-    typeof price === 'number' ? `$${price.toFixed(2)}` : String(price)
+  const formattedPrice = `$${price.toFixed(2)}`
 
   function handleAddToCart() {
-    // Replace with real cart dispatch in a full implementation
     console.info(`[ProductCard] Add to cart → id:${id}, name:"${name}"`)
   }
 
   return (
     <article
-      className="product-card"
+      className="relative bg-white border border-gray-200 rounded-xl overflow-hidden flex flex-col
+                 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg
+                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
       aria-label={`${name}, ${formattedPrice}${!inStock ? ', out of stock' : ''}`}
       tabIndex={0}
       role="listitem"
@@ -63,7 +62,7 @@ export default function ProductCard({ product }) {
       {/* Out-of-stock badge */}
       {!inStock && (
         <span
-          className="product-card__badge product-card__badge--out"
+          className="absolute top-2 left-2 z-10 bg-red-100 text-red-800 text-xs font-bold px-2 py-1 rounded-full"
           aria-label="Out of stock"
         >
           Out of Stock
@@ -71,54 +70,62 @@ export default function ProductCard({ product }) {
       )}
 
       {/* Product image */}
-      <div className="product-card__image-wrap">
+      <div className="w-full h-44 overflow-hidden bg-gray-50">
         {image ? (
           <img
             src={image}
             alt={name}
-            className="product-card__image"
+            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
             loading="lazy"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none'
-            }}
+            onError={(e) => { e.currentTarget.style.display = 'none' }}
           />
         ) : (
-          <div className="product-card__image-placeholder" aria-hidden="true">
+          <div
+            className="w-full h-full flex items-center justify-center text-5xl text-gray-300"
+            aria-hidden="true"
+          >
             🛍️
           </div>
         )}
       </div>
 
       {/* Card body */}
-      <div className="product-card__body">
+      <div className="flex flex-col gap-1 p-4 flex-1">
         {category && (
-          <span className="product-card__category">{category}</span>
+          <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+            {category}
+          </span>
         )}
 
-        <h3 className="product-card__name">{name}</h3>
+        <h3 className="text-sm font-semibold text-gray-900 leading-snug line-clamp-2">
+          {name}
+        </h3>
 
         {rating > 0 && (
-          <div className="product-card__rating">
+          <div className="flex items-center gap-1.5 mt-0.5">
             <StarRating rating={rating} />
             {reviewCount > 0 && (
-              <span className="product-card__review-count">
+              <span className="text-xs text-gray-400">
                 ({reviewCount.toLocaleString()})
               </span>
             )}
           </div>
         )}
 
-        <div className="product-card__footer">
-          <span className="product-card__price">{formattedPrice}</span>
+        {/* Price + CTA */}
+        <div className="flex items-center justify-between mt-auto pt-3 gap-2">
+          <span className="text-lg font-bold text-gray-900">
+            {formattedPrice}
+          </span>
           <button
-            className="product-card__btn"
+            onClick={handleAddToCart}
             disabled={!inStock}
             aria-label={
-              inStock
-                ? `Add ${name} to cart`
-                : `${name} is out of stock`
+              inStock ? `Add ${name} to cart` : `${name} is out of stock`
             }
-            onClick={handleAddToCart}
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors
+                       bg-blue-600 text-white hover:bg-blue-700
+                       disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
           >
             {inStock ? 'Add to Cart' : 'Unavailable'}
           </button>

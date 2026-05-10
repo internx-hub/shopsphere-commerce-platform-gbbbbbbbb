@@ -1,58 +1,73 @@
-import React from 'react'
+'use client'
 
-// Category icon map — extend as needed
-const CATEGORY_ICONS = {
-  Electronics: '💻',
-  Fashion: '👗',
+interface CategorySidebarProps {
+  categories: string[]
+  selectedCategory: string | null
+  onSelect: (category: string | null) => void
+}
+
+const CATEGORY_ICONS: Record<string, string> = {
+  Electronics:    '💻',
+  Fashion:        '👗',
   'Home & Kitchen': '🏠',
-  Sports: '🏋️',
-  Grocery: '🛒',
+  Sports:         '🏋️',
+  Grocery:        '🛒',
 }
 
 /**
  * CategorySidebar
  *
- * Sticky sidebar listing all product categories derived from the live product set.
- * Calls onSelect(category) on click; onSelect(null) resets to "All".
+ * Sticky sidebar that lists product categories.
+ * Calls onSelect(category) when a category is clicked.
+ * Calls onSelect(null) to reset to "All Products".
  *
- * Accessible: <nav> landmark, aria-current on active item, keyboard-navigable buttons.
+ * Accessible: <nav> landmark, aria-current on the active item.
  */
-export default function CategorySidebar({ categories = [], selectedCategory, onSelect }) {
-  // Silent guard — no console.error left in production code
-  if (!Array.isArray(categories)) return null
-
+export default function CategorySidebar({
+  categories,
+  selectedCategory,
+  onSelect,
+}: CategorySidebarProps) {
   return (
-    <nav
-      className="category-sidebar"
-      aria-label="Product categories"
-    >
-      <h2 className="category-sidebar__heading">Categories</h2>
+    <nav aria-label="Product categories">
+      <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-3">
+        Categories
+      </h2>
 
-      <ul className="category-sidebar__list" role="list">
-        {/* All Products reset */}
+      <ul role="list" className="flex flex-col gap-0.5">
+        {/* All Products — resets filter */}
         <li>
           <button
-            className={`category-sidebar__item${!selectedCategory ? ' category-sidebar__item--active' : ''}`}
             onClick={() => onSelect(null)}
             aria-current={!selectedCategory ? 'true' : undefined}
             aria-label="Show all products"
+            className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-left transition-colors ${
+              !selectedCategory
+                ? 'bg-blue-50 text-blue-700 font-semibold'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
           >
-            <span className="category-sidebar__icon" aria-hidden="true">🏪</span>
+            <span aria-hidden="true">🏪</span>
             All Products
           </button>
         </li>
 
+        {/* One button per category */}
         {categories.map((cat) => {
           const isActive = selectedCategory === cat
           return (
             <li key={cat}>
               <button
-                className={`category-sidebar__item${isActive ? ' category-sidebar__item--active' : ''}`}
                 onClick={() => onSelect(cat)}
                 aria-current={isActive ? 'true' : undefined}
                 aria-label={`Filter by ${cat}`}
+                className={`flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-left transition-colors ${
+                  isActive
+                    ? 'bg-blue-50 text-blue-700 font-semibold'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
               >
-                <span className="category-sidebar__icon" aria-hidden="true">
+                <span aria-hidden="true">
                   {CATEGORY_ICONS[cat] ?? '📦'}
                 </span>
                 {cat}

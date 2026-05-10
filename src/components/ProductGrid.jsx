@@ -1,57 +1,56 @@
-import React, { useMemo } from 'react'
+'use client'
+
+import { useMemo } from 'react'
+import { Product } from '../types/product'
 import ProductCard from './ProductCard'
 
-// ---------------------------------------------------------------------------
-// SkeletonCard — shown while products are loading
-// ---------------------------------------------------------------------------
+interface ProductGridProps {
+  products: Product[]
+  selectedCategory: string | null  // null = show all
+  loading: boolean
+  error: string | null
+}
+
+/** Skeleton card shown while data is loading */
 function SkeletonCard() {
   return (
     <div
       aria-hidden="true"
-      style={{
-        height: 300,
-        borderRadius: 12,
-        background: '#e5e7eb',
-        animation: 'pulse 1.5s ease-in-out infinite',
-      }}
+      className="h-72 rounded-xl bg-gray-200 animate-pulse"
     />
   )
 }
 
-// ---------------------------------------------------------------------------
-// ProductGrid
-// Props:
-//   products         {Array}       – full product list from parent
-//   selectedCategory {string|null} – active filter (null = all)
-//   loading          {boolean}     – show skeletons while fetching
-//   error            {string|null} – non-null when fetch failed
-// ---------------------------------------------------------------------------
+/**
+ * ProductGrid
+ *
+ * Renders a responsive grid of ProductCards.
+ * Filters by selectedCategory when non-null.
+ * Shows skeletons while loading and friendly messages for empty/error states.
+ */
 export default function ProductGrid({
-  products = [],
-  selectedCategory = null,
-  loading = false,
-  error = null,
-}) {
-  // ── useMemo at top level — fixes the conditional hook bug ────────────────
+  products,
+  selectedCategory,
+  loading,
+  error,
+}: ProductGridProps) {
+  /**
+   * Category filter — useMemo is at the top level (before any early returns)
+   * to satisfy the Rules of Hooks. Filtering is case-insensitive.
+   */
   const filtered = useMemo(() => {
-    if (!Array.isArray(products)) return []
     if (!selectedCategory) return products
     return products.filter(
-      (p) => (p.category || '').toLowerCase() === selectedCategory.toLowerCase()
+      (p) =>
+        (p.category ?? '').toLowerCase() === selectedCategory.toLowerCase()
     )
   }, [products, selectedCategory])
 
-  // ── Guard: invalid prop ──────────────────────────────────────────────────
-  if (!Array.isArray(products)) {
-    return <p role="alert">Invalid product data.</p>
-  }
-
-  // ── Loading state ────────────────────────────────────────────────────────
+  // ── Loading state ──────────────────────────────────────────────────────────
   if (loading) {
     return (
       <section aria-label="Loading products" aria-busy="true">
-        <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }`}</style>
-        <div style={gridStyle}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {Array.from({ length: 8 }).map((_, i) => (
             <SkeletonCard key={i} />
           ))}
@@ -60,71 +59,80 @@ export default function ProductGrid({
     )
   }
 
-  // ── Error state ──────────────────────────────────────────────────────────
+  // ── Fetch error ────────────────────────────────────────────────────────────
   if (error) {
     return (
-      <div role="alert" style={msgStyle}>
-        <p style={{ fontSize: '2rem' }}>⚠️</p>
-        <p><strong>{error}</strong></p>
-        <p>Please try refreshing the page.</p>
+      <div
+        role="alert"
+        className="flex flex-col items-center gap-2 py-16 text-center text-gray-500
+                   bg-gray-50 rounded-xl border border-gray-200"
+      >
+        <span className="text-4xl">⚠️</span>
+        <p className="font-semibold">{error}</p>
+        <p className="text-sm">Please try refreshing the page.</p>
       </div>
     )
   }
 
-  // ── Empty catalogue ──────────────────────────────────────────────────────
+  // ── No products at all ─────────────────────────────────────────────────────
   if (products.length === 0) {
     return (
-      <div role="status" style={msgStyle}>
-        <p style={{ fontSize: '2rem' }}>🛒</p>
-        <p><strong>No products available</strong></p>
+      <div
+        role="status"
+        className="flex flex-col items-center gap-2 py-16 text-center text-gray-500
+                   bg-gray-50 rounded-xl border border-gray-200"
+      >
+        <span className="text-4xl">🛒</span>
+        <p className="font-semibold">No products available</p>
       </div>
     )
   }
 
-  // ── No results for this category ─────────────────────────────────────────
+  // ── Category has no matching products ──────────────────────────────────────
   if (filtered.length === 0) {
     return (
-      <div role="status" aria-live="polite" style={msgStyle}>
-        <p style={{ fontSize: '2rem' }}>🔍</p>
-        <p><strong>No products in &ldquo;{selectedCategory}&rdquo;</strong></p>
-        <p>Try a different category.</p>
+      <div
+        role="status"
+        aria-live="polite"
+        className="flex flex-col items-center gap-2 py-16 text-center text-gray-500
+                   bg-gray-50 rounded-xl border border-gray-200"
+      >
+        <span className="text-4xl">🔍</span>
+        <p className="font-semibold">
+          No products in &ldquo;{selectedCategory}&rdquo;
+        </p>
+        <p className="text-sm">Try selecting a different category.</p>
       </div>
     )
   }
 
-  // ── Happy path ───────────────────────────────────────────────────────────
+  // ── Render grid ────────────────────────────────────────────────────────────
   return (
-    <section aria-label={selectedCategory ? `${selectedCategory} products` : 'All products'}>
+    <section
+      aria-label={
+        selectedCategory ? `${selectedCategory} products` : 'All products'
+      }
+    >
+      {/* Result count — updates announced to screen readers */}
       <p
         aria-live="polite"
-        style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '1rem' }}
+        className="text-sm text-gray-500 mb-4"
       >
-        Showing <strong>{filtered.length}</strong>{' '}
+        Showing{' '}
+        <strong className="text-gray-800">{filtered.length}</strong>{' '}
         product{filtered.length !== 1 ? 's' : ''}
         {selectedCategory ? ` in "${selectedCategory}"` : ''}
       </p>
 
-      <div style={gridStyle} role="list" aria-label="Product list">
+      <div
+        role="list"
+        aria-label="Product list"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
+      >
         {filtered.map((product) => (
-          <ProductCard key={product.id ?? product.name} product={product} />
+          <ProductCard key={product.id} product={product} />
         ))}
       </div>
     </section>
   )
-}
-
-// ── Styles ───────────────────────────────────────────────────────────────────
-const gridStyle = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-  gap: '1.25rem',
-}
-
-const msgStyle = {
-  padding: '3rem',
-  textAlign: 'center',
-  color: '#6b7280',
-  background: '#f9fafb',
-  borderRadius: 12,
-  border: '1px solid #e5e7eb',
 }
