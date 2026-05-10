@@ -1,37 +1,57 @@
-const categories = [
-  "All",
-  "Electronics",
-  "Fashion",
-  "Books"
-];
+import React from 'react'
 
-export default function CategorySidebar({
-  selectedCategory,
-  setSelectedCategory
-}) {
+/**
+ * CategorySidebar
+ * Sticky sidebar that lists all product categories.
+ * Calls onSelect(category) when a category is clicked.
+ * "All" resets the filter (passes null).
+ * Accessible: uses nav + aria-current.
+ */
+export default function CategorySidebar({ categories = [], selectedCategory, onSelect }) {
+  if (!Array.isArray(categories)) {
+    console.error('[CategorySidebar] categories must be an array')
+    return null
+  }
+
   return (
-    <aside className="sticky top-4 h-fit">
-      <h2 className="font-bold mb-4">
-        Categories
-      </h2>
+    <nav
+      className="category-sidebar"
+      aria-label="Product categories"
+      role="navigation"
+    >
+      <h2 className="category-sidebar__heading">Categories</h2>
 
-      <div className="flex flex-col gap-2">
-        {categories.map((category) => (
+      <ul className="category-sidebar__list" role="list">
+        {/* All Products */}
+        <li>
           <button
-            key={category}
-            onClick={() =>
-              setSelectedCategory(category)
-            }
-            className={`px-4 py-2 rounded-lg text-left ${
-              selectedCategory === category
-                ? "bg-black text-white"
-                : "bg-gray-100"
-            }`}
+            className={`category-sidebar__item${!selectedCategory ? ' category-sidebar__item--active' : ''}`}
+            onClick={() => onSelect(null)}
+            aria-current={!selectedCategory ? 'true' : undefined}
+            aria-label="Show all products"
           >
-            {category}
+            <span className="category-sidebar__icon" aria-hidden="true">🏪</span>
+            All Products
           </button>
-        ))}
-      </div>
-    </aside>
-  );
+        </li>
+
+        {categories.map(cat => {
+          const isActive = selectedCategory === cat
+          return (
+            <li key={cat}>
+              <button
+                className={`category-sidebar__item${isActive ? ' category-sidebar__item--active' : ''}`}
+                onClick={() => onSelect(cat)}
+                aria-current={isActive ? 'true' : undefined}
+                aria-label={`Filter by ${cat}`}
+              >
+                <span className="category-sidebar__dot" aria-hidden="true" />
+                {cat}
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+    </nav>
+  )
 }
