@@ -1,5 +1,3 @@
-// components/CategorySidebar.jsx
-
 const categories = [
   "All",
   "Electronics",
@@ -8,8 +6,8 @@ const categories = [
 ];
 
 export default function CategorySidebar({
-  selected,
-  setSelected
+  selectedCategory,
+  setSelectedCategory
 }) {
   return (
     <aside className="sticky top-4 h-fit">
@@ -18,17 +16,19 @@ export default function CategorySidebar({
       </h2>
 
       <div className="flex flex-col gap-2">
-        {categories.map((cat) => (
+        {categories.map((category) => (
           <button
-            key={cat}
-            onClick={() => setSelected(cat)}
-            className={`text-left px-3 py-2 rounded ${
-              selected === cat
+            key={category}
+            onClick={() =>
+              setSelectedCategory(category)
+            }
+            className={`px-4 py-2 rounded-lg text-left ${
+              selectedCategory === category
                 ? "bg-black text-white"
                 : "bg-gray-100"
             }`}
           >
-            {cat}
+            {category}
           </button>
         ))}
       </div>

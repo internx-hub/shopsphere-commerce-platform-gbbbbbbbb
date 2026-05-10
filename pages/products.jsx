@@ -1,10 +1,9 @@
-// pages/products.jsx
-
 import { useState } from "react";
-import products from "../data/products";
 
 import ProductGrid from "../components/ProductGrid";
 import CategorySidebar from "../components/CategorySidebar";
+
+import products from "../data/products";
 
 export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] =
@@ -14,23 +13,26 @@ export default function ProductsPage() {
     selectedCategory === "All"
       ? products
       : products.filter(
-          (p) => p.category === selectedCategory
+          (product) =>
+            product.category === selectedCategory
         );
 
   return (
     <div className="flex gap-8 p-6">
       
-      {/* Sidebar */}
-      <div className="w-64 hidden md:block">
+      <div className="hidden md:block w-64">
         <CategorySidebar
-          selected={selectedCategory}
-          setSelected={setSelectedCategory}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={
+            setSelectedCategory
+          }
         />
       </div>
 
-      {/* Product Grid */}
       <div className="flex-1">
-        <ProductGrid products={filteredProducts} />
+        <ProductGrid
+          products={filteredProducts}
+        />
       </div>
 
     </div>
