@@ -1,69 +1,69 @@
+import React from "react";
+
 export default function CategorySidebar({
   categories = [],
   selectedCategory,
-  setSelectedCategory,
+  onSelect,
 }) {
   return (
-    <aside style={sidebarStyle}>
-      <h2 style={titleStyle}>Categories</h2>
+    <nav style={styles.sidebar} aria-label="Product categories">
+      <h2 style={styles.heading}>Categories</h2>
 
       <button
-        onClick={() => setSelectedCategory("All")}
         style={{
-          ...buttonStyle,
-          ...(selectedCategory === "All" ? activeStyle : {}),
+          ...styles.item,
+          ...(selectedCategory === null ? styles.active : {}),
         }}
+        onClick={() => onSelect(null)}
       >
-        All
+        All Products
       </button>
 
-      {categories.map((category) => (
-        <button
-          key={category}
-          onClick={() => setSelectedCategory(category)}
-          style={{
-            ...buttonStyle,
-            ...(selectedCategory === category ? activeStyle : {}),
-          }}
-        >
-          {category}
-        </button>
-      ))}
-    </aside>
-  )
+      {categories.map((cat) => {
+        const isActive = selectedCategory === cat;
+
+        return (
+          <button
+            key={cat}
+            style={{ ...styles.item, ...(isActive ? styles.active : {}) }}
+            onClick={() => onSelect(cat)}
+          >
+            {cat}
+          </button>
+        );
+      })}
+    </nav>
+  );
 }
 
-const sidebarStyle = {
-  position: "sticky",
-  top: "20px",
-  alignSelf: "flex-start",
-  padding: "1rem",
-  background: "#ffffff",
-  border: "1px solid #e5e7eb",
-  borderRadius: "12px",
-  minWidth: "220px",
-  height: "fit-content",
-}
-
-const titleStyle = {
-  marginBottom: "1rem",
-  fontSize: "1.2rem",
-}
-
-const buttonStyle = {
-  display: "block",
-  width: "100%",
-  padding: "0.8rem 1rem",
-  marginBottom: "0.6rem",
-  border: "none",
-  borderRadius: "8px",
-  background: "#f3f4f6",
-  cursor: "pointer",
-  textAlign: "left",
-  transition: "0.2s",
-}
-
-const activeStyle = {
-  background: "#111827",
-  color: "#ffffff",
-}
+const styles = {
+  sidebar: {
+    padding: "1rem",
+    borderRadius: "14px",
+    border: "1px solid #e5e7eb",
+    background: "#ffffff",
+    boxShadow: "0 4px 14px rgba(0,0,0,0.04)",
+  },
+  heading: {
+    fontSize: "1rem",
+    fontWeight: 700,
+    marginBottom: "1rem",
+  },
+  item: {
+    width: "100%",
+    textAlign: "left",
+    padding: "0.75rem 0.85rem",
+    marginBottom: "0.5rem",
+    borderRadius: "10px",
+    border: "1px solid transparent",
+    background: "#f9fafb",
+    cursor: "pointer",
+    fontSize: "0.95rem",
+    fontWeight: 500,
+  },
+  active: {
+    background: "#dbeafe",
+    border: "1px solid #93c5fd",
+    fontWeight: 700,
+  },
+};
