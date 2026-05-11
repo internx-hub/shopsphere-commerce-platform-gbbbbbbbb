@@ -1,32 +1,39 @@
+# schemas.py
+
 from pydantic import BaseModel, Field
 
+
+# ---------------- PRODUCT ----------------
+
+class ProductCreate(BaseModel):
+    name: str
+    price: float
+
+    # VALIDATION
+    stock_quantity: int = Field(..., ge=0)
+
+
+class ProductResponse(BaseModel):
+    id: int
+    name: str
+    price: float
+    stock_quantity: int
+
+    class Config:
+        orm_mode = True
+
+
+# ---------------- ORDER ----------------
+
 class OrderCreate(BaseModel):
-
-    customer_name: str = Field(
-        min_length=2,
-        max_length=50
-    )
-
-    product_name: str = Field(
-        min_length=2,
-        max_length=100
-    )
-
-    amount: float = Field(gt=0)
-
-
-class OrderUpdate(BaseModel):
-    status: str
+    product_id: int
+    quantity: int = Field(..., gt=0)
 
 
 class OrderResponse(BaseModel):
-
     id: int
-    customer_name: str
-    product_name: str
-    amount: float
-    status: str
-    payment_intent_id: str | None
+    product_id: int
+    quantity: int
 
     class Config:
         orm_mode = True
