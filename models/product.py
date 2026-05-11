@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String, Float, Text
 from database import Base
 
 
@@ -7,8 +7,9 @@ class Product(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    # FIXED: added index
     name = Column(String, index=True, nullable=False)
+
+    description = Column(Text, nullable=True)
 
     price = Column(Float, nullable=False)
 

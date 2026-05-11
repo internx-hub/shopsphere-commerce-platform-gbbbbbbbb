@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from database import Base, engine
-from routers.products import router as products_router
+from routers.product import router as products_router
 
 Base.metadata.create_all(bind=engine)
 

@@ -17,7 +17,8 @@ def test_create_product_success():
         json={
             "name": "iPhone",
             "description": "Apple mobile",
-            "price": 999.99
+            "price": 999.99,
+            "stock_quantity": 5
         }
     )
 
@@ -27,6 +28,7 @@ def test_create_product_success():
 
     assert data["name"] == "iPhone"
     assert data["price"] == 999.99
+    assert data["description"] == "Apple mobile"
 
 
 # ---------------------------------------------------
@@ -39,7 +41,8 @@ def test_create_product_invalid():
         "/api/products/",
         json={
             "name": "",
-            "price": -100
+            "price": -100,
+            "stock_quantity": 0
         }
     )
 
