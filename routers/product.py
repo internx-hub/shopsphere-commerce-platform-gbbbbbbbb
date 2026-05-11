@@ -48,6 +48,7 @@ def get_products(
 
     products = (
         db.query(Product)
+        .order_by(Product.id)
         .offset(skip)
         .limit(limit)
         .all()
