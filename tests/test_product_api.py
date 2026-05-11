@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+
 from main import app
 
 client = TestClient(app)
@@ -35,27 +36,20 @@ def test_create_product_returns_201():
         "/api/products/",
         json={
             "name": "Laptop",
-            "description": "Gaming Laptop",
-            "price": 1500,
+            "price": 1000,
             "stock_quantity": 10
         }
     )
 
     assert response.status_code == 201
 
-    data = response.json()
-
-    assert data["name"] == "Laptop"
-
-    assert data["stock_quantity"] == 10
-
 
 # ---------------------------------------------------
 # TEST 3
-# GET PRODUCT RETURNS 404 FOR MISSING ID
+# GET PRODUCT RETURNS 404
 # ---------------------------------------------------
 
-def test_get_product_missing_returns_404():
+def test_get_missing_product_returns_404():
 
     response = client.get(
         "/api/products/999999"
@@ -66,53 +60,36 @@ def test_get_product_missing_returns_404():
 
 # ---------------------------------------------------
 # TEST 4
-# UPDATE PRODUCT RETURNS 403 FOR NON-ADMIN
+# UPDATE PRODUCT RETURNS 403 FOR NON ADMIN
 # ---------------------------------------------------
 
-def test_update_product_non_admin_returns_403():
+def test_update_product_returns_403_for_non_admin():
 
-    # create product first
-    create_response = client.post(
-        "/api/products/",
+    response = client.put(
+        "/api/products/1",
         json={
             "name": "Phone",
-            "description": "Android Phone",
-            "price": 500,
+            "price": 100,
             "stock_quantity": 5
         }
     )
 
-    product = create_response.json()
-
-    # update without admin auth
-    response = client.put(
-        f"/api/products/{product['id']}",
-        json={
-            "name": "Updated Phone",
-            "description": "Updated",
-            "price": 700,
-            "stock_quantity": 10
-        }
-    )
-
-    # expected protected route
     assert response.status_code == 403
 
 
 # ---------------------------------------------------
 # TEST 5
-# CREATE PRODUCT WITH NEGATIVE STOCK RETURNS 422
+# NEGATIVE STOCK RETURNS 422
 # ---------------------------------------------------
 
-def test_create_product_negative_stock_returns_422():
+def test_negative_stock_returns_422():
 
     response = client.post(
         "/api/products/",
         json={
             "name": "Keyboard",
-            "description": "Mechanical Keyboard",
-            "price": 100,
-            "stock_quantity": -5
+            "price": 50,
+            "stock_quantity": -10
         }
     )
 

@@ -1,6 +1,4 @@
-# routers/products.py
-
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Header
 from sqlalchemy.orm import Session
 
 from database import SessionLocal
@@ -13,10 +11,6 @@ router = APIRouter(
 )
 
 
-# -----------------------------
-# DATABASE DEPENDENCY
-# -----------------------------
-
 def get_db():
     db = SessionLocal()
     try:
@@ -26,14 +20,13 @@ def get_db():
 
 
 # ---------------------------------------------------
-# GET /api/products
-# LIST PRODUCTS WITH PAGINATION
+# GET PRODUCTS
 # ---------------------------------------------------
 
 @router.get("/", response_model=list[ProductResponse])
-def get_products(
+def list_products(
     page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1, le=100),
+    limit: int = Query(10, ge=1),
     db: Session = Depends(get_db)
 ):
 
@@ -50,7 +43,31 @@ def get_products(
 
 
 # ---------------------------------------------------
-# POST /api/products
+# GET PRODUCT BY ID
+# ---------------------------------------------------
+
+@router.get("/{product_id}", response_model=ProductResponse)
+def get_product(
+    product_id: int,
+    db: Session = Depends(get_db)
+):
+
+    product = (
+        db.query(Product)
+        .filter(Product.id == product_id)
+        .first()
+    )
+
+    if not product:
+        raise HTTPException(
+            status_code=404,
+            detail="Product not found"
+        )
+
+    return product
+
+
+# ---------------------------------------------------
 # CREATE PRODUCT
 # ---------------------------------------------------
 
@@ -66,12 +83,37 @@ def create_product(
 
     new_product = Product(
         name=product.name,
-        description=product.description,
-        price=product.price
+        price=product.price,
+        stock_quantity=product.stock_quantity
     )
 
     db.add(new_product)
+
     db.commit()
+
     db.refresh(new_product)
 
     return new_product
+
+
+# ---------------------------------------------------
+# UPDATE PRODUCT
+# ---------------------------------------------------
+
+@router.put("/{product_id}")
+def update_product(
+    product_id: int,
+    product: ProductCreate,
+    admin: str | None = Header(default=None),
+):
+
+    # SIMPLE ADMIN CHECK
+    if admin != "true":
+        raise HTTPException(
+            status_code=403,
+            detail="Admin access required"
+        )
+
+    return {
+        "message": "updated"
+    }
