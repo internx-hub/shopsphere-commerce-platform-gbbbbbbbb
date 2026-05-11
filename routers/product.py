@@ -26,7 +26,7 @@ def get_db():
 @router.get("/", response_model=list[ProductResponse])
 def list_products(
     page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1),
+    limit: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db)
 ):
     skip = (page - 1) * limit
