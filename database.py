@@ -8,6 +8,8 @@ DATABASE_URL = os.getenv(
     "DATABASE_URL",
     "sqlite:///./test.db"
 )
+DATABASE_URL = "sqlite:///./shop.db"
+DATABASE_URL = "sqlite:///./test.db"
 
 engine = create_engine(
     DATABASE_URL,

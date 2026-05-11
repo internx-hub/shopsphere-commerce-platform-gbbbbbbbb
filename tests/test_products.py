@@ -19,6 +19,7 @@ def test_create_product_success():
             "description": "Apple mobile",
             "price": 999.99,
             "stock_quantity": 5
+            "price": 999.99
         }
     )
 
@@ -43,6 +44,7 @@ def test_create_product_invalid():
             "name": "",
             "price": -100,
             "stock_quantity": 0
+            "price": -100
         }
     )
 

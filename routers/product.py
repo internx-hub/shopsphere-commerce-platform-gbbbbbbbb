@@ -1,4 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, Header
+# routers/products.py
+
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from database import SessionLocal
@@ -10,6 +13,10 @@ router = APIRouter(
     tags=["Products"]
 )
 
+
+# -----------------------------
+# DATABASE DEPENDENCY
+# -----------------------------
 
 def get_db():
     db = SessionLocal()
@@ -25,11 +32,20 @@ def get_db():
 
 @router.get("/", response_model=list[ProductResponse])
 def list_products(
+# GET /api/products
+# LIST PRODUCTS WITH PAGINATION
+# ---------------------------------------------------
+
+@router.get("/", response_model=list[ProductResponse])
+def get_products(
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db)
 ):
     skip = (page - 1) * limit
+
+    skip = (page - 1) * limit
+
     products = (
         db.query(Product)
         .offset(skip)
@@ -64,6 +80,12 @@ def get_product(
 
 
 # ---------------------------------------------------
+
+    return products
+
+
+# ---------------------------------------------------
+# POST /api/products
 # CREATE PRODUCT
 # ---------------------------------------------------
 
@@ -169,3 +191,15 @@ def delete_product(
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail="Failed to delete product")
+
+    new_product = Product(
+        name=product.name,
+        description=product.description,
+        price=product.price
+    )
+
+    db.add(new_product)
+    db.commit()
+    db.refresh(new_product)
+
+    return new_product
