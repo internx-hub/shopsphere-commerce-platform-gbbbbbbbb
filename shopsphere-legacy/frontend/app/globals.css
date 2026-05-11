@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --color-brand: #0078c5;
+  --color-brand-dark: #0160a1;
+  --color-error: #dc2626;
+  --color-success: #16a34a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #1a1a2e;
+  background-color: #fafbfc;
+}
+
+/* TODO: audit all these custom styles - some might conflict with tailwind */
+.btn-primary {
+  @apply bg-brand-600 text-white px-4 py-2 rounded-lg font-medium;
+  @apply hover:bg-brand-700 transition-colors duration-150;
+}
+
+.btn-primary:disabled {
+  @apply bg-gray-300 text-gray-500 cursor-not-allowed;
+  @apply hover:bg-gray-300;
+}
+
+.btn-secondary {
+  @apply border border-gray-300 text-gray-700 px-4 py-2 rounded-lg font-medium;
+  @apply hover:bg-gray-50 transition-colors duration-150;
+}
+
+.input-field {
+  @apply w-full border border-gray-300 rounded-lg px-3 py-2 text-sm;
+  @apply focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent;
+  @apply placeholder:text-gray-400;
+}
+
+/* Old styles that might still be referenced somewhere */
+.card {
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+/* FIXME: this is causing CLS issues on the product page */
+.skeleton-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Cart drawer overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 40;
+}
+
+/* Toast notification styles */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 50;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(1rem);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
