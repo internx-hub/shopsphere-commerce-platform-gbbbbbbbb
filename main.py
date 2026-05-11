@@ -47,7 +47,6 @@ def create_order(
             models.Product.stock_quantity - order.quantity
         })
     )
-
     if updated_rows == 0:
         db.rollback()
         raise HTTPException(status_code=409, detail="Insufficient stock")
