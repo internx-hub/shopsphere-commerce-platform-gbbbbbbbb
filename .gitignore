@@ -1,3 +1,7 @@
+.env
+__pycache__/
+*.pyc
+orders.db
 # Dependencies
 node_modules/
 __pycache__/
