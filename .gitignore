@@ -2,3 +2,44 @@
 __pycache__/
 *.pyc
 orders.db
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Environment
+.env
+.env.local
+.env.production.local
+.env.development.local
+
+# Build
+.next/
+dist/
+build/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+test-results/
+playwright-report/
+.blob-report/
+
+# Stripe
+stripe_*
+
+# Misc
+*.log
+npm-debug.log*
