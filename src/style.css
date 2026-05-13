@@ -1,0 +1,53 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.card {
+  border: 1px solid #ddd;
+  padding: 16px;
+  border-radius: 10px;
+  background: white;
+}
+
+.skeleton {
+  animation: pulse 1.5s infinite;
+}
+
+.skeleton-image {
+  height: 120px;
+  background: #ddd;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.skeleton-text {
+  height: 14px;
+  background: #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.skeleton-text.short {
+  width: 60%;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
